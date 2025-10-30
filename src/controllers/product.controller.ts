@@ -14,7 +14,7 @@ export const getAllProduct = async (req: Request, res: Response) => {
 
 export const getProduct = async (req: Request, res: Response) => {
   try {
-    const id = req.params;
+    const { id } = req.params;
     const product = await Product.findById(id);
     if (!product) {
       return res.status(404).json({ message: "Product note found" });
