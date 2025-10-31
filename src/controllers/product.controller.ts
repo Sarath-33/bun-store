@@ -1,71 +1,80 @@
 import type { Request, Response } from "express";
 import Product from "../models/productModel";
 
+// ✅ Get all products
 export const getAllProduct = async (req: Request, res: Response) => {
   try {
-    const product = await Product.find().sort({ createdAt: -1 });
-    res.status(201).json(product);
+    const products = await Product.find().sort({ createdAt: -1 });
+    return res.status(200).json(products); // only one response
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Get a error at getting products" });
+    return res.status(500).json({ message: "Error getting products" });
   }
-  res.json({ message: "Get all the products" });
 };
 
+// ✅ Get single product
 export const getProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).json({ message: "Product note found" });
+      return res.status(404).json({ message: "Product not found" });
     }
-    res.status(200).json(product);
+    return res.status(200).json(product);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Get a error at getting products" });
+    return res.status(500).json({ message: "Error getting product" });
   }
-  res.send("get a single product");
 };
 
+// ✅ Create product
 export const createProduct = async (req: Request, res: Response) => {
   const { name, price, description, image } = req.body;
   try {
     if (!name || !price || !description || !image) {
-      return res.status(404).json({ message: "Every field is required" });
+      return res.status(400).json({ message: "Every field is required" });
     }
     const product = new Product({ name, price, description, image });
     const savedProduct = await product.save();
-    res.status(201).json(savedProduct);
+    return res.status(201).json(savedProduct);
   } catch (error) {
-    console.log("You got a error! this is the error: ", error);
+    console.log("Error creating product:", error);
+    return res.status(500).json({ message: "Error creating product" });
   }
-  res.send("Create Product");
 };
+
+// ✅ Update product
 export const updateProduct = async (req: Request, res: Response) => {
   const { name, price, description, image } = req.body;
   try {
     if (!name || !price || !description || !image) {
-      return res.status(404).json({ message: "Every field is required" });
+      return res.status(400).json({ message: "Every field is required" });
     }
-    const updateProduct = await Product.findByIdAndUpdate(
+    const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       { name, price, description, image },
       { new: true }
     );
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    return res.status(200).json(updatedProduct);
   } catch (error) {
-    console.log("You got a error! this is the error: ", error);
+    console.log("Error updating product:", error);
+    return res.status(500).json({ message: "Error updating product" });
   }
-  res.send("Update the product");
 };
+
+// ✅ Delete product
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
-    const deleteProduct = await Product.findByIdAndDelete(req.params.id);
-    if (!deleteProduct) {
-      return res.status(404).json({ message: "Not found" });
+    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found" });
     }
-    res.status(201).json(deleteProduct);
+    return res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
-    console.log("You got a error! this is the error: ", error);
+    console.log("Error deleting product:", error);
+    return res.status(500).json({ message: "Error deleting product" });
   }
-  res.send("Delete the product");
 };
