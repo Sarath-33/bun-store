@@ -1,69 +1,89 @@
 import type { Request, Response } from "express";
 import User from "../models/userModel";
 
+// Get all users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const user = await User.find().sort({ createdAt: -1 });
-    if (!user) {
-      return res.status(404).json({ message: "Users not found" });
+    const users = await User.find().sort({ createdAt: -1 });
+    if (!users || users.length === 0) {
+      return res.status(404).json({ message: "No users found" });
     }
-    res.status(201).json(user);
+    res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: "Get a error at getting all Users" });
+    console.error(error);
+    res.status(500).json({ message: "Error fetching users" });
   }
-  res.json({ message: "Get all the users" });
 };
+
+// Get single user
 export const getUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({ message: "Users not found" });
+      return res.status(404).json({ message: "User not found" });
     }
-    res.status(201).json(user);
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: "Get a error at getting all Users" });
+    console.error(error);
+    res.status(500).json({ message: "Error fetching user" });
   }
-  res.send("get a single user");
 };
+
+// Create user
 export const createUser = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
   try {
-    if (!name || !email || password) {
-      return res.status(404).json({ message: "All fields are requried" });
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
     }
+
     const user = new User({ name, email, password });
     const savedUser = await user.save();
+
     res.status(201).json(savedUser);
   } catch (error) {
-    res.status(500).json({ message: "Get a error at getting all Users" });
+    console.error(error);
+    res.status(500).json({ message: "Error creating user" });
   }
-  res.send("Create User");
 };
+
+// Update user
 export const updateUser = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
   try {
     if (!name || !email || !password) {
-      return res.status(404).json({ message: "Every field is required" });
+      return res.status(400).json({ message: "All fields are required" });
     }
-    const updateUser = await User.findByIdAndUpdate(
+
+    const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       { name, email, password },
       { new: true }
     );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(updatedUser);
   } catch (error) {
-    console.log("You got a error! this is the error: ", error);
+    console.error(error);
+    res.status(500).json({ message: "Error updating user" });
   }
-  res.send("Update the User");
 };
+
+// Delete user
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const deleteUser = await User.findByIdAndDelete(req.params.id);
-    if (!deleteUser) {
-      return res.status(404).json({ message: "Not found" });
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
     }
-    res.status(201).json(deleteUser);
+    res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    console.log("You got a error! this is the error: ", error);
+    console.error(error);
+    res.status(500).json({ message: "Error deleting user" });
   }
 };
+
