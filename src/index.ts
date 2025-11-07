@@ -13,7 +13,7 @@ app.use("/api/v1/product", productRouter);
 app.use("/api/v1/user/", userRouter);
 
 app.get("/", (req, res) => {
-  res.send("Hello from bun + express");
+  res.send("Hello from bun + express with ts");
 });
 
 connectDB().then(() => {
