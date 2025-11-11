@@ -15,24 +15,12 @@ const productSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
-      minLength: 30,
+      minLength: 15,
       maxLength: 255,
     },
     image: {
       type: String,
       required: true,
-    },
-    category: {
-      type: String,
-      required: true,
-    },
-    stock: {
-      type: Number,
-      default: 0,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now()
     },
   },
   { timestamps: true }
